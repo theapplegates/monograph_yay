@@ -17,6 +17,10 @@ dist-ssr
 .nitro
 *.local
 
+# Envs
+.env
+.env.local
+
 # Internal release/workflow notes
 AGENTS.md
 RELEASE_CHECKLIST.md
