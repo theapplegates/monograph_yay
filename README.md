@@ -1,5 +1,8 @@
 # Monograph - Minimal Astro Blog Theme
 
+For JXL → AVIF → WebP images, no-import Markdown snippets, and the upload command,
+see [Responsive Cloudinary images](./CLOUDINARY.md).
+
 [![Monograph theme preview](/preview.webp)](https://monograph.xocoweb.workers.dev/)
 
 [![Astro 7](https://img.shields.io/badge/Astro-7-FF5D01?style=for-the-badge&logo=astro&logoColor=white)](https://astro.build/)

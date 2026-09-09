@@ -25,6 +25,17 @@ const posts = defineCollection({
         .object({
           src: image(),
           alt: z.string(),
+          // Opt in only after uploading this cover. Local src remains the social image.
+          cloudinary: z
+            .object({
+              src: z.string().min(1),
+              breakpoints: z
+                .union([z.string(), z.array(z.number().int().positive()).min(1)])
+                .optional(),
+              sizes: z.string().min(1).optional(),
+              devices: z.string().min(1).optional(),
+            })
+            .optional(),
           creditName: z.string().optional(),
           creditUrl: z.url().optional(),
         })

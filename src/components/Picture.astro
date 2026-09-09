@@ -1,0 +1,23 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { buildPicture } from "@/lib/cloudinary-picture.mjs";
+
+interface Props extends Omit<HTMLAttributes<"img">, "src" | "alt" | "width" | "height" | "srcset"> {
+  src: string;
+  alt: string;
+  width: number | string;
+  height: number | string;
+  breakpoints: string | (number | { width: number })[] | { breakpoints: (number | { width: number })[] };
+  devices?: string | { minWidth: number; vw: number; aspectRatio: string }[];
+  pictureClass?: string;
+  "picture-class"?: string;
+}
+
+const model = buildPicture(Astro.props,
+  import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || import.meta.env.CLOUDINARY_CLOUD_NAME);
+---
+
+<picture class={model.pictureClass}>
+  {model.sources.map((source) => <source {...source} />)}
+  <img {...(model.img as HTMLAttributes<"img">)} />
+</picture>
