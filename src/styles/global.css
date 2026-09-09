@@ -167,6 +167,15 @@
  * always win over them (`.icon-btn md:hidden` has to be able to hide).
  */
 @layer components {
+  .responsive-picture {
+    display: block;
+  }
+
+  .responsive-picture img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
   /* -------------------------------------------------------------- layout --- */
 
   /* Full-width band carrying the shared page gutters. */
