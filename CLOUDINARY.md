@@ -29,8 +29,7 @@ This uploads the image, requests Cloudinary's WebP-based breakpoints, updates
   height="1500"
   sizes="(min-width: 768px) 720px, 100vw"
   breakpoints="200, 382, 527, 730, 1024, 2000"
-  picture-class="responsive-picture"
->
+  picture-class="responsive-picture">
 </cloudinary-picture>
 ```
 
@@ -42,6 +41,8 @@ New snippets use an explicit closing tag because custom HTML elements are not vo
 elements. Older self-closing `<cloudinary-picture ... />` snippets also work.
 Keep attributes quoted. Snippets carry their widths directly; changing the cache
 alone does not change previously pasted snippets.
+Keep the opening tag's final `>` on the same line as the last attribute. In Markdown,
+a `>` on its own line can start a blockquote and break a multiline custom tag.
 
 ## Art direction (different crops by device)
 
@@ -116,6 +117,23 @@ and `img` elements and their responsive attributes.
 Builds validate markup and metadata, but do not confirm Cloudinary assets exist.
 After uploading and deploying, verify live image requests. The upload command uses
 path-derived public IDs and overwrites an existing asset at the same ID.
+
+## If an image is invisible without an error
+
+Inspect the page's HTML. If it still contains a literal `<cloudinary-picture>` tag
+instead of a `<picture>` with `<source>` and `<img>` children, the Markdown plugin
+is not running. Keep `rehypeCloudinaryPicture` registered alongside `rehypeSlug`
+in `markdown.processor` in `astro.config.mjs`, including its cloud-name loading.
+`npm run test:images` now tests the actual Astro configuration and the incident-review
+post, so removing that connection fails a test.
+
+After changing the configuration or `.env`, stop and restart `npm run dev` (or
+rebuild and redeploy). Set `PUBLIC_CLOUDINARY_CLOUD_NAME` to your actual cloud name
+locally and on the build host. Keep your API key and secret private.
+
+If `<picture>` is present but a request fails, check its Cloudinary URL and response
+in the browser's Network panel. Confirm the cloud name and uploaded public ID match
+your asset. A successful build does not verify that an asset exists in that cloud.
 
 References: [Cloudinary transformations](https://cloudinary.com/documentation/image_transformations)
 and [responsive breakpoints](https://cloudinary.com/documentation/image_upload_api_reference#responsive_breakpoints).

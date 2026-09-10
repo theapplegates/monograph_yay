@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
@@ -68,6 +69,48 @@ function markdown(input) {
     .use(rehypeStringify)
     .process(input);
 }
+
+test("the real Astro configuration renders Cloudinary pictures in the affected post", async () => {
+  const post = await readFile(
+    new URL(
+      "../src/content/posts/a-small-incident-review-template-for-busy-teams/index.md",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  // Load the actual config through Vite, including its TypeScript imports. Testing
+  // the plugin alone cannot catch it being disconnected from Astro's pipeline.
+  const { stdout: html } = await promisify(execFile)(
+    process.execPath,
+    [
+      "--input-type=module",
+      "-e",
+      `
+        import { loadConfigFromFile } from "vite";
+        const { config } = await loadConfigFromFile(
+          { command: "build", mode: "production" }, "astro.config.mjs",
+        );
+        const renderer = await config.markdown.processor.createRenderer(config.markdown);
+        const { code } = await renderer.render(process.argv[1]);
+        process.stdout.write(code);
+      `,
+      post.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, ""),
+    ],
+    {
+      cwd: fileURLToPath(new URL("../", import.meta.url)),
+      env: { ...process.env, PUBLIC_CLOUDINARY_CLOUD_NAME: "demo", CLOUDINARY_CLOUD_NAME: "" },
+    },
+  );
+  assert.equal((html.match(/<picture\b/g) ?? []).length, 1);
+  assert.deepEqual(
+    [...html.matchAll(/<source\b[^>]*type="([^"]+)"/g)].map((match) => match[1]),
+    ["image/jxl", "image/avif", "image/webp"],
+  );
+  assert.match(html, /<img\b[^>]*src="https:\/\/res\.cloudinary\.com\/demo\//);
+  assert.match(html, /<\/picture>[\s\S]*<p>Incident reviews fail/);
+  assert.match(html, /<h2 id="what-happened">/);
+  assert.ok(!html.includes("<cloudinary-picture"));
+});
 
 test("upload command caches returned widths and prints no-import snippets in both modes", async () => {
   const root = await mkdtemp(join(tmpdir(), "monograph-upload-test-"));
