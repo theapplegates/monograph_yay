@@ -39,6 +39,46 @@ This question prevents blame from sneaking in through the side door. Engineers m
 
 If a decision looks strange after the incident, that is usually where the system can improve.
 
+<picture>
+  <source
+    type="image/jxl"
+    srcset="
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_jxl/c_scale,w_596/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.jxl 596w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_jxl/c_scale,w_817/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.jxl 817w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_jxl/c_scale,w_1155/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.jxl 1155w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_jxl/c_scale,w_1208/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.jxl 1208w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_jxl/c_scale,w_1378/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.jxl 1378w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_jxl/c_scale,w_1440/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.jxl 1440w"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1440px"
+  />
+  <source
+    type="image/avif"
+    srcset="
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_avif/c_scale,w_596/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.avif 596w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_avif/c_scale,w_817/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.avif 817w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_avif/c_scale,w_1155/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.avif 1155w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_avif/c_scale,w_1208/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.avif 1208w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_avif/c_scale,w_1378/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.avif 1378w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_avif/c_scale,w_1440/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.avif 1440w"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1440px"
+  />
+  <img
+    src="https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_800/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp"
+    srcset="
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_596/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp 596w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_817/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp 817w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_1155/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp 1155w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_1208/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp 1208w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_1378/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp 1378w,
+    https://res.cloudinary.com/paulapplegate-com/image/upload/q_auto,f_webp/c_scale,w_1440/v1789044912/breakpoints/bpsfgmxzddfehdpcthrq.webp 1440w"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1440px"
+    alt=""
+    loading="lazy"
+    width="1440"
+    height="810"
+  />
+</picture>
+
 ## What will we change?
 
 Pick one to three actions. Each action needs an owner, a due date, and a reason. "Improve monitoring" is not an action. "Alert when queue age exceeds five minutes for ten minutes" is.
