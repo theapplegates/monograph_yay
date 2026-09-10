@@ -13,15 +13,15 @@ cover:
   creditUrl: "https://unsplash.com/photos/purple-white-and-orange-light-tZCrFpSNiIQ"
 featured: false
 ---
-<cloudinary-picture 
- src="v1789004318/monograph/alina-chernovolova-S-LngVsRi04-unsplash-ca77b253d377a4aaf0f8ef08"
- alt="A hairdo"
- width="5472"
- height="3648"
- breakpoints="320,1208,1748,1979,2018,2296,2357,2400"
- sizes="100vw"/>
- </cloudinary-picture>
 
+<cloudinary-picture
+  src="v1789004318/monograph/alina-chernovolova-S-LngVsRi04-unsplash-ca77b253d377a4aaf0f8ef08"
+  alt="A hairdo"
+  width="5472"
+  height="3648"
+  breakpoints="320,1208,1748,1979,2018,2296,2357,2400"
+  sizes="100vw">
+</cloudinary-picture>
 
 Incident reviews fail when they are too heavy to run consistently. A small team does not need a fifty-question form after every alert. It needs a repeatable way to understand what happened, what helped, and what should change.
 
