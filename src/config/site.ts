@@ -1,13 +1,13 @@
 export const siteConfig = {
   /** Wordmark shown in the header and footer. Monograph uses text, never a logo image. */
-  name: "Monograph",
+  name: "Living Life",
   tagline: "A quiet place for long-form writing",
   title: "Monograph - A minimal Astro blog theme",
   description:
     "A text-first Astro theme for essays, notes, and long-form writing, with a command-palette search and a light/dark reading mode.",
-  siteUrl: "https://monograph.xocoweb.workers.dev",
-  authorName: "Andrei Alba",
-  email: "hello@example.com",
+  siteUrl: "https://monograph.paulapplegate.com",
+  authorName: "Paul Applegate",
+  email: "me@paulapplegate.com",
   language: "en",
   dateLocale: "en-US",
   locale: "en_US",
