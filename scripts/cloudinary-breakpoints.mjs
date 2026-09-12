@@ -2,7 +2,8 @@
 /**
  * Upload an image to Cloudinary, request responsive breakpoints, merge the
  * resulting widths into src/data/cloudinary-breakpoints.json, and print a
- * ready-to-paste <cloudinary-picture> snippet with no imports.
+ * ready-to-paste <picture> HTML block. Astro passes raw HTML through
+ * Markdown, so no plugin or imports are needed.
  *
  * Usage:
  *   npm run cloudinary:breakpoints -- src/assets/images/my-photo.jpg
@@ -33,7 +34,7 @@ import { stdin, stdout } from "node:process";
 import {
   parseDevices,
   normalizeBreakpoints,
-  pictureSnippet,
+  pictureHtml,
 } from "../src/lib/cloudinary-picture.mjs";
 
 const cloudinary = cloudinarySdk.v2;
@@ -239,20 +240,23 @@ async function main() {
   );
   console.log(sorted.join(", "));
 
-  const snippet = pictureSnippet({
-    src: publicId,
-    alt: "TODO: describe this image",
-    width: result.width,
-    height: result.height,
-    ...(choice.mode === "art"
-      ? { devices: buildDevicesString(choice.devices) }
-      : { sizes: choice.sizes }),
-    breakpoints: sorted.join(", "),
-    "picture-class": "responsive-picture",
-  });
+  const snippet = pictureHtml(
+    {
+      src: publicId,
+      alt: "TODO: describe this image",
+      width: result.width,
+      height: result.height,
+      ...(choice.mode === "art"
+        ? { devices: buildDevicesString(choice.devices) }
+        : { sizes: choice.sizes }),
+      breakpoints: sorted.join(", "),
+      "picture-class": "responsive-picture",
+    },
+    cloudName,
+  );
   if (choice.mode === "art") console.log(`sizes (derived): ${buildSizes(choice.devices)}`);
   console.log(
-    "\nPaste this into your .md or .mdx post and replace the alt text. No imports needed:\n",
+    "\nPaste this into your .md or .mdx post, with a blank line before and after, and replace the alt text. No imports needed:\n",
   );
   console.log(snippet);
   console.log("\nFor an article cover, keep cover.src and add this inside cover:\n");

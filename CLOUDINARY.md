@@ -19,30 +19,24 @@ npm run cloudinary:breakpoints -- src/assets/images/my-photo.jpg --sizes="(min-w
 ```
 
 This uploads the image, requests Cloudinary's WebP-based breakpoints, updates
-`src/data/cloudinary-breakpoints.json`, and prints a ready-to-paste snippet:
+`src/data/cloudinary-breakpoints.json`, and prints a ready-to-paste `<picture>`
+HTML block (formatted approximately like this — use the actual command output):
 
 ```html
-<cloudinary-picture
-  src="assets/images/my-photo"
-  alt="Describe the photo"
-  width="2000"
-  height="1500"
-  sizes="(min-width: 768px) 720px, 100vw"
-  breakpoints="200, 382, 527, 730, 1024, 2000"
-  picture-class="responsive-picture">
-</cloudinary-picture>
+<picture class="responsive-picture">
+  <source type="image/jxl" sizes="(min-width: 768px) 720px, 100vw" srcset="https://res.cloudinary.com/your-cloud/image/upload/c_limit,w_200,q_auto,f_jxl/assets/images/my-photo 200w, …" width="2000" height="1500">
+  <source type="image/avif" srcset="…" sizes="…">
+  <source type="image/webp" srcset="…" sizes="…">
+  <img loading="lazy" decoding="async" src="…" srcset="…" sizes="…" alt="Describe the photo" width="2000" height="1500">
+</picture>
 ```
 
 Paste the **actual command output** into your `.md` or `.mdx` post, with a blank line
-before and after it, and replace the alt text. No imports needed. The example above
-is illustrative: use your uploaded image's actual public ID, dimensions, and widths.
-
-New snippets use an explicit closing tag because custom HTML elements are not void
-elements. Older self-closing `<cloudinary-picture ... />` snippets also work.
-Keep attributes quoted. Snippets carry their widths directly; changing the cache
-alone does not change previously pasted snippets.
-Keep the opening tag's final `>` on the same line as the last attribute. In Markdown,
-a `>` on its own line can start a blockquote and break a multiline custom tag.
+before and after it, and replace the alt text. No imports and no Markdown plugin are
+needed: Astro passes raw HTML through unchanged. The example above is illustrative:
+use your uploaded image's actual public ID, dimensions, and widths. Snippets carry
+their widths directly; changing the cache alone does not change previously pasted
+snippets.
 
 ## Art direction (different crops by device)
 
@@ -94,7 +88,7 @@ for Monograph's page gutters.
 In `.astro` files, import `Picture` from `@/components/Picture.astro` and supply the
 same props. MDX posts can use `<Picture ... />` without imports because the post template
 supplies it in its component map. Use this component for JavaScript expressions or
-array props; the lowercase custom element accepts literal quoted attributes only.
+array props; pasted HTML is static, so dynamic values require the component.
 
 ## Verification and files
 
@@ -104,15 +98,13 @@ npm run check
 npm run build
 ```
 
-- `scripts/cloudinary-breakpoints.mjs`: upload, cache, and snippet output.
+- `scripts/cloudinary-breakpoints.mjs`: upload, cache, and `<picture>` HTML output.
 - `src/components/Picture.astro`: component for Astro and MDX.
-- `src/lib/cloudinary-picture.mjs`: shared URL, crop, width, and fallback logic.
-- `src/plugins/rehype-cloudinary-picture.mjs`: Markdown and MDX expansion.
-- `astro.config.mjs`: registers the plugin in Astro 7's existing unified pipeline.
+- `src/lib/cloudinary-picture.mjs`: shared URL, crop, width, fallback, and HTML logic.
 
 This theme has no separate `markdown-pipeline.mjs` or sanitizer. If adding
-`rehype-sanitize` later, place this plugin first and allow standard `picture`, `source`,
-and `img` elements and their responsive attributes.
+`rehype-sanitize` later, allow standard `picture`, `source`, and `img` elements and
+their responsive attributes so pasted `<picture>` blocks survive.
 
 Builds validate markup and metadata, but do not confirm Cloudinary assets exist.
 After uploading and deploying, verify live image requests. The upload command uses
@@ -120,12 +112,11 @@ path-derived public IDs and overwrites an existing asset at the same ID.
 
 ## If an image is invisible without an error
 
-Inspect the page's HTML. If it still contains a literal `<cloudinary-picture>` tag
-instead of a `<picture>` with `<source>` and `<img>` children, the Markdown plugin
-is not running. Keep `rehypeCloudinaryPicture` registered alongside `rehypeSlug`
-in `markdown.processor` in `astro.config.mjs`, including its cloud-name loading.
-`npm run test:images` now tests the actual Astro configuration and the incident-review
-post, so removing that connection fails a test.
+Inspect the page's HTML. Check that the post still contains a `<picture>` with
+`<source>` and `<img>` children — pasted blocks pass through unchanged, so a missing
+image means the block was edited or mangled in the post, not that a build step dropped
+it. `npm run test:images` renders the actual Astro configuration against the
+incident-review post, so anything that strips raw HTML from Markdown fails a test.
 
 After changing the configuration or `.env`, stop and restart `npm run dev` (or
 rebuild and redeploy). Set `PUBLIC_CLOUDINARY_CLOUD_NAME` to your actual cloud name
