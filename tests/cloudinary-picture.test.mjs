@@ -11,8 +11,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
 import rehypeStringify from "rehype-stringify";
-import { buildPicture, pictureSnippet } from "../src/lib/cloudinary-picture.mjs";
-import rehypeCloudinaryPicture from "../src/plugins/rehype-cloudinary-picture.mjs";
+import { buildPicture, pictureHtml } from "../src/lib/cloudinary-picture.mjs";
 
 const props = {
   src: "assets/images/photo",
@@ -60,17 +59,52 @@ test("art direction groups formats inside descending media queries and reserves 
   assert.equal(model.sources[0].width / model.sources[0].height, 1.6);
 });
 
+test("pictureHtml emits a complete <picture> block with escaped attributes", () => {
+  const html = pictureHtml(props, "demo");
+  assert.equal((html.match(/<source\b/g) ?? []).length, 3);
+  assert.deepEqual(
+    [...html.matchAll(/<source\b[^>]*type="([^"]+)"/g)].map((m) => m[1]),
+    ["image/jxl", "image/avif", "image/webp"],
+  );
+  assert.match(html, /^<picture class="responsive-picture">\n[\s\S]*\n<\/picture>$/);
+  assert.match(html, /<img loading="lazy" decoding="async" src="https:\/\/res\.cloudinary\.com\/demo\//);
+  // Alt text must be attribute-escaped so pasted markup stays valid.
+  assert.ok(html.includes('alt="A &quot;blue&quot; sky &amp; clouds"'));
+  assert.ok(!html.includes('"' + props.alt + '"'));
+});
+
+test("art-direction HTML carries media queries only above the smallest device", () => {
+  const html = pictureHtml({ ...props, devices: "1200|40|original,0|100|1:1" }, "demo");
+  assert.equal((html.match(/<source\b/g) ?? []).length, 6);
+  assert.equal((html.match(/media="\(min-width: 1200px\)"/g) ?? []).length, 3);
+});
+
+/** The standard markdown pipeline with no Cloudinary plugin: raw HTML passes through. */
 function markdown(input) {
   return unified()
     .use(remarkParse)
     .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeCloudinaryPicture, { cloudName: "demo" })
     .use(rehypeRaw)
     .use(rehypeStringify)
     .process(input);
 }
 
-test("the real Astro configuration renders Cloudinary pictures in the affected post", async () => {
+test("printed HTML survives Markdown untouched and leaves code examples alone", async () => {
+  const html = pictureHtml({ ...props, "picture-class": "responsive-picture" }, "demo");
+  const output = String(
+    await markdown(`Before.\n\n${html}\n\nAfter.\n\n\`\`\`html\n${html}\n\`\`\``),
+  );
+  const pictures = output.match(/<picture\b/g) ?? [];
+  assert.equal(pictures.length, 1); // the pasted block renders; the code sample stays escaped
+  assert.equal((output.match(/<source\b/g) ?? []).length, 3);
+  // The code sample survived as escaped literal text (&#x3C; is the serializer's escape for "<").
+  assert.ok(output.includes("&#x3C;picture"));
+  assert.match(output, /<picture class="responsive-picture">/);
+  assert.match(output, /<p>After\.<\/p>/);
+  assert.ok(!output.includes("<cloudinary-picture"));
+});
+
+test("the real Astro configuration passes the post's <picture> HTML through", async () => {
   const post = await readFile(
     new URL(
       "../src/content/posts/a-small-incident-review-template-for-busy-teams/index.md",
@@ -79,7 +113,7 @@ test("the real Astro configuration renders Cloudinary pictures in the affected p
     "utf8",
   );
   // Load the actual config through Vite, including its TypeScript imports. Testing
-  // the plugin alone cannot catch it being disconnected from Astro's pipeline.
+  // the snippet alone cannot catch the pipeline stripping raw HTML.
   const { stdout: html } = await promisify(execFile)(
     process.execPath,
     [
@@ -98,7 +132,7 @@ test("the real Astro configuration renders Cloudinary pictures in the affected p
     ],
     {
       cwd: fileURLToPath(new URL("../", import.meta.url)),
-      env: { ...process.env, PUBLIC_CLOUDINARY_CLOUD_NAME: "demo", CLOUDINARY_CLOUD_NAME: "" },
+      env: { ...process.env, PUBLIC_CLOUDINARY_CLOUD_NAME: "" },
     },
   );
   assert.equal((html.match(/<picture\b/g) ?? []).length, 1);
@@ -106,13 +140,13 @@ test("the real Astro configuration renders Cloudinary pictures in the affected p
     [...html.matchAll(/<source\b[^>]*type="([^"]+)"/g)].map((match) => match[1]),
     ["image/jxl", "image/avif", "image/webp"],
   );
-  assert.match(html, /<img\b[^>]*src="https:\/\/res\.cloudinary\.com\/demo\//);
+  assert.match(html, /<img\b[^>]*src="https:\/\/res\.cloudinary\.com\//);
   assert.match(html, /<\/picture>[\s\S]*<p>Incident reviews fail/);
   assert.match(html, /<h2 id="what-happened">/);
   assert.ok(!html.includes("<cloudinary-picture"));
 });
 
-test("upload command caches returned widths and prints no-import snippets in both modes", async () => {
+test("upload command caches returned widths and prints full HTML in both modes", async () => {
   const root = await mkdtemp(join(tmpdir(), "monograph-upload-test-"));
   try {
     for (const dir of ["scripts", "src/lib", "src/assets/images", "node_modules/cloudinary"]) {
@@ -152,10 +186,13 @@ test("upload command caches returned widths and prints no-import snippets in bot
         },
       );
       assert.ok(!stdout.includes("import Picture"));
-      const snippet = stdout.match(/<cloudinary-picture\n[\s\S]*?<\/cloudinary-picture>/)?.[0];
+      const snippet = stdout.match(/<picture\b[\s\S]*?<\/picture>/)?.[0];
       assert.ok(snippet, stdout);
+      assert.ok(!snippet.includes("cloudinary-picture"));
+      // The printed block renders through a plain Markdown pipeline as-is.
       const html = String(await markdown(snippet));
       assert.equal((html.match(/<source\b/g) ?? []).length, flag.startsWith("--sizes") ? 3 : 6);
+      assert.match(html, /srcset="[^"]*res\.cloudinary\.com\/demo\//);
       const cache = JSON.parse(
         await readFile(join(root, "src/data/cloudinary-breakpoints.json"), "utf8"),
       );
@@ -167,53 +204,6 @@ test("upload command caches returned widths and prints no-import snippets in bot
   } finally {
     await rm(root, { recursive: true, force: true });
   }
-});
-
-test("printed snippets render in Markdown, preserve prose, and leave code examples alone", async () => {
-  const snippet = pictureSnippet({ ...props, "picture-class": "responsive-picture" });
-  const output = String(
-    await markdown(`Before.\n\n${snippet}\n\nAfter.\n\n\`\`\`html\n${snippet}\n\`\`\``),
-  );
-  assert.equal((output.match(/<picture\b/g) ?? []).length, 1);
-  assert.equal((output.match(/<source\b/g) ?? []).length, 3);
-  assert.match(output, /<picture class="responsive-picture">/);
-  assert.match(output, /<p>After\.<\/p>/);
-  assert.ok(!output.includes("<cloudinary-picture"));
-});
-
-test("legacy self-closing Markdown snippets cannot swallow following prose", async () => {
-  const snippet = pictureSnippet({ ...props, "picture-class": "responsive-picture" }).replace(
-    ">\n</cloudinary-picture>",
-    "/>",
-  );
-  assert.match(
-    String(await markdown(`${snippet}\n\nAfter.`)),
-    /<\/picture>(?:<\/p>)?\s*<p>After\.<\/p>/,
-  );
-});
-
-test("MDX literal attributes are converted without imports", () => {
-  const tree = {
-    children: [
-      {
-        type: "mdxJsxFlowElement",
-        name: "cloudinary-picture",
-        attributes: Object.entries(props).map(([name, value]) => ({
-          type: "mdxJsxAttribute",
-          name,
-          value: String(value),
-        })),
-        children: [],
-      },
-    ],
-  };
-  rehypeCloudinaryPicture({ cloudName: "demo" })(tree, {
-    fail(message) {
-      throw new Error(message);
-    },
-  });
-  assert.equal(tree.children[0].tagName, "picture");
-  assert.equal(tree.children[0].children.length, 4);
 });
 
 test("invalid metadata fails instead of emitting broken image URLs", () => {

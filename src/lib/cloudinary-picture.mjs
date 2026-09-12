@@ -1,4 +1,4 @@
-/** Shared by the Astro component, Markdown/MDX plugin, and upload command. */
+/** Shared by the Astro component and the upload command. */
 export const formats = ["jxl", "avif", "webp"];
 
 export function parseDevices(input) {
@@ -144,19 +144,6 @@ export function buildPicture(props, cloudName) {
   };
 }
 
-export function pictureTree(model) {
-  const element = (tagName, properties, children = []) => ({
-    type: "element",
-    tagName,
-    properties,
-    children,
-  });
-  return element("picture", { className: model.pictureClass }, [
-    ...model.sources.map((source) => element("source", source)),
-    element("img", model.img),
-  ]);
-}
-
 export function escapeAttribute(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -165,22 +152,20 @@ export function escapeAttribute(value) {
     .replace(/>/g, "&gt;");
 }
 
-export function pictureSnippet(props) {
-  const keys = [
-    "src",
-    "alt",
-    "width",
-    "height",
-    props.devices ? "devices" : "sizes",
-    "breakpoints",
-    "picture-class",
-  ];
+/**
+ * Render the full <picture> block for pasting directly into Markdown or MDX.
+ * Astro passes raw HTML through, so no plugin or imports are needed.
+ */
+export function pictureHtml(props, cloudName) {
+  const model = buildPicture(props, cloudName);
+  const attrs = (obj) =>
+    Object.entries(obj)
+      .map(([key, value]) => `${key}="${escapeAttribute(value)}"`)
+      .join(" ");
   return [
-    "<cloudinary-picture",
-    ...keys.map(
-      (key, index) =>
-        `  ${key}="${escapeAttribute(props[key])}"${index === keys.length - 1 ? ">" : ""}`,
-    ),
-    "</cloudinary-picture>",
+    `<picture class="${escapeAttribute(model.pictureClass)}">`,
+    ...model.sources.map((source) => `  <source ${attrs(source)}>`),
+    `  <img ${attrs(model.img)}>`,
+    `</picture>`,
   ].join("\n");
 }
