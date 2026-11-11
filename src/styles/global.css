@@ -1,26 +1,50 @@
 @import "tailwindcss";
 @source "../**/*.{astro,ts,md,mdx}";
 
+/* Geist - Regular/Normal */
 @font-face {
   font-family: "Geist";
-  src:
-    url("/fonts/geist/Geist-Variable.woff2") format("woff2-variations"),
-    url("/fonts/geist/Geist-Variable.woff2") format("woff2");
+  src: url("/fonts/geist/Geist[wght].ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
+/* Geist - Italic */
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/geist/Geist-Italic[wght].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Geist Mono - Regular/Normal */
 @font-face {
   font-family: "Geist Mono";
-  src:
-    url("/fonts/geist/GeistMono-Variable.woff2") format("woff2-variations"),
-    url("/fonts/geist/GeistMono-Variable.woff2") format("woff2");
+  src: url("/fonts/geist/GeistMono[wght].ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
+/* Geist Mono - Italic */
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/geist/GeistMono-Italic[wght].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Geist Serif */
+@font-face {
+  font-family: "Geist Serif";
+  src: url("/fonts/geist/GeistSerif[ELSH].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 /*
  * Bridges the palette below into Tailwind, which turns each entry into
  * utilities (`text-accent`, `border-border`, `bg-muted`, and so on). Add a
@@ -65,7 +89,7 @@
     BlinkMacSystemFont, Arial, sans-serif;
   --font-display: var(--font-sans);
   --font-serif:
-    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", ui-serif, serif;
+    "Geist Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", ui-serif, serif;
   --font-mono:
     "Geist Mono", ui-monospace, "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Consolas,
     Menlo, "Liberation Mono", monospace;

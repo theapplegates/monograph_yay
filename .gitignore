@@ -20,6 +20,8 @@ dist-ssr
 # Envs
 .env
 .env.local
+*.env
+.env.local*
 
 # Internal release/workflow notes
 AGENTS.md
