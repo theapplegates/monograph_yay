@@ -15,7 +15,7 @@ The older `CLOUDINARY_CLOUD_NAME` variable is also supported.
 Run from the project directory, replacing the path with your image:
 
 ```sh
-npm run cloudinary:breakpoints -- src/assets/images/my-photo.jpg --sizes="(min-width: 768px) 720px, 100vw"
+npm run cloudinary:breakpoints -- src/assets/images/Lindsey-Luke-Cartoon.jpg --sizes="(min-width: 768px) 720px, 100vw"
 ```
 
 This uploads the image, requests Cloudinary's WebP-based breakpoints, updates
